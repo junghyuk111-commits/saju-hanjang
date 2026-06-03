@@ -175,7 +175,7 @@ async function generate(){
         :'<div class="pill"><div class="pill-card" style="opacity:.35"><div class="pill-s">?</div><div class="pill-b">?</div></div><div class="pill-label">시주</div></div>';
     }).join('');
 
-    var html=raw.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    var html=raw.replace(/##\s*/g,'').replace(/---/g,'').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
     document.getElementById('resName').textContent=name;
     document.getElementById('resPreview').innerHTML=html;
     document.getElementById('progBox').classList.remove('show');

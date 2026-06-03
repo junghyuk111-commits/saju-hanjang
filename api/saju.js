@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 8000, messages })
+      body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 16000, messages })
     });
     const data = await response.json();
     return res.status(response.status).json(data);
