@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사주한장 · 운영자 대시보드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --border: #2e2e38;
+  --gold: #c9933a;
+  --gold2: #e8c47a;
+  --red: #9b2a1a;
+  --text: #e8e0d0;
+  --muted: #7a7060;
+  --green: #3a8c5a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.layout { display:flex; min-height:100vh; }
+.sidebar {
+  width: 220px; flex-shrink:0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 32px 0;
+  display:flex; flex-direction:column;
+}
+.sidebar-logo {
+  text-align:center;
+  padding: 0 20px 28px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .sym { font-size:1.8rem; display:block; margin-bottom:6px; }
+.sidebar-logo h2 {
+  font-family:'Noto Serif KR',serif;
+  font-size:1rem; font-weight:700;
+  letter-spacing:.15em; color:var(--gold);
+}
+.sidebar-logo span { font-size:.7rem; color:var(--muted); letter-spacing:.05em; }
+.sidebar-nav { padding:20px 0; flex:1; }
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 24px;
+  font-size:.85rem; color:var(--muted);
+  cursor:pointer; transition:all .15s;
+  border-left:3px solid transparent;
+}
+.nav-item.active {
+  color:var(--gold); border-left-color:var(--gold);
+  background:rgba(201,147,58,.07);
+}
+.nav-item:hover { color:var(--text); }
+.sidebar-bottom {
+  padding:16px 20px;
+  border-top:1px solid var(--border);
+  font-size:.72rem; color:var(--muted); text-align:center;
+}
+
+/* ── Main ── */
+.main { flex:1; overflow-y:auto; }
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 32px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  position:sticky; top:0; z-index:10;
+}
+.topbar h1 { font-family:'Noto Serif KR',serif; font-size:1.1rem; font-weight:600; }
+.topbar .badge {
+  background:rgba(201,147,58,.15);
+  border:1px solid rgba(201,147,58,.3);
+  color:var(--gold2);
+  font-size:.72rem; padding:4px 12px; border-radius:20px;
+}
+
+.content { padding:28px 32px; max-width:780px; }
+
+/* ── Steps ── */
+.steps {
+  display:flex; gap:0; margin-bottom:32px;
+}
+.step {
+  display:flex; align-items:center; gap:10px;
+  flex:1;
+}
+.step-num {
+  width:28px; height:28px;
+  border-radius:50%;
+  background:var(--border);
+  color:var(--muted);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.75rem; font-weight:600; flex-shrink:0;
+  transition:all .3s;
+}
+.step.done .step-num { background:var(--green); color:white; }
+.step.active .step-num { background:var(--gold); color:var(--bg); }
+.step-label { font-size:.78rem; color:var(--muted); }
+.step.active .step-label { color:var(--gold2); }
+.step.done .step-label { color:var(--text); }
+.step-line { flex:1; height:1px; background:var(--border); margin:0 8px; }
+
+/* ── Card ── */
+.card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:24px;
+  margin-bottom:20px;
+}
+.card-title {
+  font-family:'Noto Serif KR',serif;
+  font-size:.95rem; font-weight:600;
+  color:var(--gold2);
+  margin-bottom:18px;
+  display:flex; align-items:center; gap:8px;
+}
+
+/* ── Form ── */
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.form-row.three { grid-template-columns:1fr 1fr 1fr; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+label {
+  font-size:.75rem; color:var(--muted);
+  letter-spacing:.05em; font-weight:500;
+}
+input, select, textarea {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:10px 14px;
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:.88rem;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s;
+  width:100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(201,147,58,.12);
+}
+textarea { resize:vertical; min-height:80px; line-height:1.7; }
+select option { background:var(--surface2); }
+
+.concern-wrap { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+.ctag {
+  padding:6px 14px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  font-size:.78rem; color:var(--muted);
+  cursor:pointer; transition:all .15s;
+}
+.ctag:hover { border-color:var(--gold); color:var(--gold2); }
+.ctag.on {
+  background:rgba(201,147,58,.15);
+  border-color:var(--gold);
+  color:var(--gold2);
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 28px;
+  background:linear-gradient(135deg, var(--red), #7a1f12);
+  color:white; border:none; border-radius:5px;
+  font-family:'Noto Serif KR',serif;
+  font-size:.95rem; font-weight:600;
+  letter-spacing:.1em; cursor:pointer;
+  transition:all .2s;
+}
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(155,42,26,.4); }
+.btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+.btn-gold {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 28px;
+  background:linear-gradient(135deg, var(--gold), #a07020);
+  color:var(--bg); border:none; border-radius:5px;
+  font-family:'Noto Serif KR',serif;
+  font-size:.95rem; font-weight:700;
+  letter-spacing:.08em; cursor:pointer;
+  transition:all .2s;
+}
+.btn-gold:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(201,147,58,.35); }
+
+.btn-outline {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:11px 22px;
+  background:transparent;
+  color:var(--muted); border:1px solid var(--border); border-radius:5px;
+  font-size:.85rem; cursor:pointer; transition:all .15s;
+}
+.btn-outline:hover { border-color:var(--gold); color:var(--gold2); }
+
+/* ── Progress ── */
+.progress-box {
+  display:none;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:32px 24px;
+  text-align:center;
+  margin-bottom:20px;
+}
+.progress-box.show { display:block; }
+.prog-spinner {
+  width:44px; height:44px;
+  border:3px solid var(--border);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  margin:0 auto 16px;
+  animation:spin .9s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.prog-text { color:var(--muted); font-size:.88rem; }
+.prog-sub { font-size:.78rem; color:var(--muted); margin-top:6px; opacity:.7; }
+
+/* ── Result preview ── */
+.result-area {
+  display:none;
+  margin-bottom:20px;
+}
+.result-area.show { display:block; }
+.result-preview {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:20px;
+  max-height:600px;
+  overflow-y:auto;
+  font-size:.85rem;
+  line-height:2;
+  color:#c8bfb0;
+  white-space:pre-wrap;
+  margin-bottom:16px;
+}
+.result-preview strong { color:var(--gold2); }
+.action-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+
+/* ── Pillars mini ── */
+.pillars-mini { display:flex; gap:6px; margin-bottom:16px; }
+.pill {
+  width:44px; text-align:center;
+  border:1px solid var(--border); border-radius:4px; overflow:hidden;
+}
+.pill .s {
+  background:var(--red); color:white;
+  font-family:'Noto Serif KR',serif; font-size:.95rem;
+  padding:6px 0;
+}
+.pill .b {
+  background:rgba(201,147,58,.12); color:var(--text);
+  font-family:'Noto Serif KR',serif; font-size:.95rem;
+  padding:6px 0; border-top:1px solid var(--border);
+}
+.pill-lbl { font-size:.65rem; color:var(--muted); text-align:center; margin-top:3px; }
+
+/* ── History ── */
+.history-list { display:flex; flex-direction:column; gap:10px; }
+.history-item {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:6px; padding:12px 16px;
+  font-size:.82rem;
+}
+.history-item .name { font-weight:500; color:var(--text); }
+.history-item .meta { color:var(--muted); font-size:.75rem; margin-top:2px; }
+.history-item .dl-btn {
+  padding:5px 14px;
+  background:rgba(201,147,58,.12);
+  border:1px solid rgba(201,147,58,.3);
+  color:var(--gold2); border-radius:4px;
+  font-size:.75rem; cursor:pointer; transition:all .15s;
+  white-space:nowrap;
+}
+.history-item .dl-btn:hover { background:rgba(201,147,58,.25); }
+
+.empty-state { text-align:center; padding:28px; color:var(--muted); font-size:.85rem; }
+
+@media(max-width:640px) {
+  .sidebar { display:none; }
+  .content { padding:16px; }
+  .form-row { grid-template-columns:1fr; }
+  .form-row.three { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img src="/logo.png" style="width:110px;height:110px;object-fit:contain;display:block;margin:0 auto 8px;">
+    <h2>사주한장</h2>
+    <span>운영자 전용</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active">✦ 새 풀이 생성</div>
+    <div class="nav-item" onclick="showHistory()">📋 생성 기록</div>
+  </nav>
+  <div class="sidebar-bottom">사주한장 · v1.0</div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <h1>사주 풀이 생성</h1>
+    <span class="badge">⚡ AI 자동 생성</span>
+  </div>
+
+  <div class="content">
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step active" id="step1">
+        <div class="step-num">1</div>
+        <div class="step-label">정보 입력</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step2">
+        <div class="step-num">2</div>
+        <div class="step-label">AI 분석</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step3">
+        <div class="step-num">3</div>
+        <div class="step-label">페이지 생성</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step4">
+        <div class="step-num">4</div>
+        <div class="step-label">전달</div>
+      </div>
+    </div>
+
+    <!-- 입력 폼 -->
+    <div id="formSection">
+      <div class="card">
+        <div class="card-title">👤 의뢰인 기본 정보</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>이름</label>
+            <input type="text" id="name" placeholder="홍길동">
+          </div>
+          <div class="form-group">
+            <label>성별</label>
+            <select id="gender">
+              <option value="남">남성</option>
+              <option value="여">여성</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>생년월일</label>
+            <input type="date" id="birth" max="2010-12-31">
+          </div>
+          <div class="form-group">
+            <label>출생 시간</label>
+            <select id="btime">
+              <option value="모름">모름 / 불분명</option>
+              <option value="자시(23~01시)">자시 (밤 11~1시)</option>
+              <option value="축시(01~03시)">축시 (새벽 1~3시)</option>
+              <option value="인시(03~05시)">인시 (새벽 3~5시)</option>
+              <option value="묘시(05~07시)">묘시 (새벽 5~7시)</option>
+              <option value="진시(07~09시)">진시 (오전 7~9시)</option>
+              <option value="사시(09~11시)">사시 (오전 9~11시)</option>
+              <option value="오시(11~13시)">오시 (오전 11~오후 1시)</option>
+              <option value="미시(13~15시)">미시 (오후 1~3시)</option>
+              <option value="신시(15~17시)">신시 (오후 3~5시)</option>
+              <option value="유시(17~19시)">유시 (오후 5~7시)</option>
+              <option value="술시(19~21시)">술시 (저녁 7~9시)</option>
+              <option value="해시(21~23시)">해시 (밤 9~11시)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎯 관심 분야</div>
+        <div class="concern-wrap" id="concerns">
+          <span class="ctag on" data-v="전체운">🌟 전체운</span>
+          <span class="ctag" data-v="재물운">💰 재물운</span>
+          <span class="ctag" data-v="연애·결혼운">❤️ 연애·결혼</span>
+          <span class="ctag" data-v="직업·사업운">💼 직업·사업</span>
+          <span class="ctag" data-v="건강운">🌿 건강운</span>
+          <span class="ctag" data-v="가족운">🏠 가족운</span>
+          <span class="ctag" data-v="올해운세">📅 올해운세</span>
+          <span class="ctag" data-v="이사·이직운">🔄 이사·이직</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💬 의뢰인 추가 메모 (선택)</div>
+        <div class="form-group">
+          <label>당근 채팅에서 받은 고민이나 특이사항</label>
+          <textarea id="memo" placeholder="예: 올해 이직을 고민 중, 연애 고민 있음, 사업 시작 예정 등"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="genBtn" onclick="generate()">
+        ✦ AI 사주 풀이 생성하기
+      </button>
+    </div>
+
+    <!-- 생성 중 -->
+    <div class="progress-box" id="progBox">
+      <div class="prog-spinner"></div>
+      <div class="prog-text">사주를 읽는 중입니다…</div>
+      <div class="prog-sub" id="progSub">사주팔자 계산 중</div>
+    </div>
+
+    <!-- 결과 -->
+    <div class="result-area" id="resultArea">
+      <div class="card">
+        <div class="card-title">✅ 생성 완료 — <span id="resName" style="color:var(--text)"></span>님 사주</div>
+        <div class="pillars-mini" id="pillarsPreview"></div>
+        <div class="result-preview" id="resPreview"></div>
+        <div class="action-row">
+          <button class="btn-gold" onclick="downloadPage()">⬇ 의뢰인 전용 페이지 다운로드</button>
+          <button class="btn-outline" onclick="resetAll()">↺ 새 의뢰인</button>
+        </div>
+        <p style="margin-top:12px;font-size:.75rem;color:var(--muted)">
+          💡 다운로드한 HTML 파일을 Netlify Drop(netlify.com/drop)에 드래그하면 즉시 URL 생성됩니다.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ── 사주 계산 ──
+const ST=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const STk=['갑','을','병','정','무','기','경','신','임','계'];
+const BRk=['자','축','인','묘','진','사','오','미','신','유','술','해'];
+const EL=['목','목','화','화','토','토','금','금','수','수'];
+const ELcol=['#5a8a3a','#5a8a3a','#c9503a','#c9503a','#c9933a','#c9933a','#8a8a9a','#8a8a9a','#3a6a9a','#3a6a9a'];
+
+function ySB(y){const s=((y-4)%10+10)%10,b=((y-4)%12+12)%12;return{s:ST[s],b:BR[b],sk:STk[s],bk:BRk[b],ei:s};}
+function mSB(y,m){const base=(y-1900)*12+(m-1);const s=(base+2)%10,b=(m+1)%12;return{s:ST[(s+10)%10],b:BR[b],sk:STk[(s+10)%10],bk:BRk[b],ei:(s+10)%10};}
+function dSB(date){const base=Math.floor((date-new Date(1900,0,1))/86400000)+10;const s=((base%10)+10)%10,b=((base%12)+12)%12;return{s:ST[s],b:BR[b],sk:STk[s],bk:BRk[b],ei:s};}
+const HIDX={'자시(23~01시)':0,'축시(01~03시)':1,'인시(03~05시)':2,'묘시(05~07시)':3,'진시(07~09시)':4,'사시(09~11시)':5,'오시(11~13시)':6,'미시(13~15시)':7,'신시(15~17시)':8,'유시(17~19시)':9,'술시(19~21시)':10,'해시(21~23시)':11};
+function hSB(dayStem,tv){if(tv==='모름')return null;const bi=HIDX[tv]??0,di=ST.indexOf(dayStem),si=((di%5)*2+10)%10;return{s:ST[(si+bi)%10],b:BR[bi],sk:STk[(si+bi)%10],bk:BRk[bi],ei:(si+bi)%10};}
+
+// ── Concern toggle ──
+document.querySelectorAll('.ctag').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('on')));
+
+let lastData=null;
+const history=[];
+
+async function generate(){
+  const name=document.getElementById('name').value.trim()||'의뢰인';
+  const gender=document.getElementById('gender').value;
+  const birth=document.getElementById('birth').value;
+  const btime=document.getElementById('btime').value;
+  const memo=document.getElementById('memo').value.trim();
+  if(!birth){alert('생년월일을 입력해 주세요.');return;}
+  const concerns=[...document.querySelectorAll('.ctag.on')].map(t=>t.dataset.v);
+  if(!concerns.length){alert('관심 분야를 선택해 주세요.');return;}
+
+  const bd=new Date(birth);
+  const y=bd.getFullYear(),m=bd.getMonth()+1,d=bd.getDate();
+  const ysb=ySB(y),msb=mSB(y,m),dsb=dSB(bd),hsb=hSB(dsb.s,btime);
+
+  // Step UI
+  setStep(2);
+  document.getElementById('formSection').style.display='none';
+  document.getElementById('progBox').classList.add('show');
+  document.getElementById('resultArea').classList.remove('show');
+
+  const progSub=document.getElementById('progSub');
+  const msgs=['사주팔자 계산 중…','오행 균형 분석 중…','대운 세운 파악 중…','풀이 작성 중…'];
+  let mi=0;
+  const interval=setInterval(()=>{if(mi<msgs.length)progSub.textContent=msgs[mi++];},1800);
+
+  const sajuStr=hsb
+    ?`연주 ${ysb.s}${ysb.b}(${ysb.sk}${ysb.bk}), 월주 ${msb.s}${msb.b}(${msb.sk}${msb.bk}), 일주 ${dsb.s}${dsb.b}(${dsb.sk}${dsb.bk}), 시주 ${hsb.s}${hsb.b}(${hsb.sk}${hsb.bk})`
+    :`연주 ${ysb.s}${ysb.b}(${ysb.sk}${ysb.bk}), 월주 ${msb.s}${msb.b}(${msb.sk}${msb.bk}), 일주 ${dsb.s}${dsb.b}(${dsb.sk}${dsb.bk}) (시주 불명)`;
+
+  const prompt=`당신은 20년 이상 경력의 한국 명리학 전문가입니다. 의뢰인과 직접 마주 앉아 이야기하듯, 따뜻하고 자연스러운 말투로 사주를 풀이해 주세요.
+
+【중요한 말투 지침】
+- "~입니다" 보다는 "~이에요", "~네요", "~거든요", "~답니다" 같은 부드러운 표현을 주로 쓰세요.
+- 딱딱한 보고서 문체가 아니라, 오랫동안 사주를 봐온 선생님이 의뢰인한테 직접 말해주는 느낌으로 써주세요.
+- 예: "이 사주는 木이 강합니다" → "사주를 보니까 木의 기운이 정말 강하게 들어와 있어요"
+- 예: "재물운이 좋습니다" → "올해는 돈 흐름이 꽤 좋아질 것 같아요. 하반기부터 특히 눈에 띄게 달라질 거예요"
+- 한자 용어를 쓸 때는 바로 옆에 쉽게 풀어서 설명해 주세요.
+- 핵심 키워드나 중요한 조언은 **굵게** 표시해 주세요.
+
+【의뢰인 정보】
+- 이름: ${name} / 성별: ${gender}
+- 생년월일: ${y}년 ${m}월 ${d}일 / 출생시: ${btime}
+- 사주: ${sajuStr}
+- 관심 분야: ${concerns.join(', ')}
+${memo?`- 의뢰인이 직접 전한 고민: ${memo}`:''}
+
+【풀이 섹션 — 반드시 아래 순서대로, ▶ 기호로 각 섹션 시작】
+
+▶ 사주 총평
+일간(${dsb.s})의 기운과 성격을 중심으로, 오행 구성의 강약, 이 사람이 타고난 기질과 삶의 패턴을 구체적이고 상세하게 설명해 주세요. 단순히 "강하다 약하다"가 아니라, 실제 삶에서 어떻게 나타나는지 예시를 들어가며 풀어주세요. 최소 5~6문장 이상.
+
+▶ 관심 분야별 운세
+${concerns.map(c=>`- ${c}: 이 사람의 사주 구조와 연결해서 구체적으로, 최소 4~5문장 이상 풀어주세요.`).join('\n')}
+${memo?`위 고민 내용을 반드시 풀이에 반영해 주세요.`:''}
+
+▶ 2026~2027 대운·세운
+현재는 2026년(丙午년)입니다. 지금 대운의 흐름과 2026년 세운이 이 사람 사주와 어떻게 맞물리는지, 구체적으로 어떤 변화와 기회가 오는지 상세히 설명해 주세요. 2027년 흐름도 포함해 주세요. 최소 5~6문장 이상.
+
+▶ 2026년 월별 흐름
+1월부터 12월까지 월별 또는 분기별로 나눠서, 각 시기마다 어떤 기운이 들어오고 무엇을 조심하거나 적극적으로 해야 하는지 구체적으로 써주세요. 특히 좋은 달과 조심해야 할 달을 명확하게 짚어주세요.
+
+▶ 개운법 & 조언
+이 사람의 사주에 맞는 개운법을 번호를 붙여 5가지 이상 알려주세요. 색상, 방향, 음식, 생활 습관, 피해야 할 것들을 구체적으로, 실생활에서 바로 실천할 수 있도록 설명해 주세요.
+
+전체 5000자 이상. 모든 섹션을 빠짐없이 완성하고 절대 중간에 끊지 마세요. 마지막 문장까지 완전히 작성하세요.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:8000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    clearInterval(interval);
+
+    // API 에러 응답 체크
+    if(!res.ok || data.error){
+      const errMsg = data.error ? data.error.type+': '+data.error.message : 'HTTP '+res.status;
+      document.getElementById('progBox').classList.remove('show');
+      document.getElementById('formSection').style.display='block';
+      setStep(1);
+      alert('오류 내용: '+errMsg+'\n\n해결 방법:\n- API 키가 claude.ai 에서 실행 중인지 확인\n- 잠시 후 다시 시도해 주세요');
+      return;
+    }
+
+    const raw=data.content?.map(c=>c.text||'').join('')||'풀이를 가져오지 못했습니다.';
+
+    lastData={name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw,memo,birth};
+    history.unshift({name,birth,concerns,raw,ysb,msb,dsb,hsb,gender,y,m,d,btime,memo,ts:new Date().toLocaleString('ko-KR')});
+
+    // pillars preview
+    const pdata=[{lbl:'시주',sb:hsb},{lbl:'일주',sb:dsb},{lbl:'월주',sb:msb},{lbl:'연주',sb:ysb}];
+    document.getElementById('pillarsPreview').innerHTML=pdata.map(p=>p.sb?`
+      <div><div class="pill"><div class="s">${p.sb.s}</div><div class="b">${p.sb.b}</div></div>
+      <div class="pill-lbl">${p.lbl}</div></div>`
+      :`<div><div class="pill" style="opacity:.35"><div class="s">?</div><div class="b">?</div></div><div class="pill-lbl">시주</div></div>`).join('');
+
+    const html=raw.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    document.getElementById('resName').textContent=name;
+    document.getElementById('resPreview').innerHTML=html;
+    document.getElementById('progBox').classList.remove('show');
+    document.getElementById('resultArea').classList.add('show');
+    setStep(3);
+
+  }catch(e){
+    clearInterval(interval);
+    document.getElementById('progBox').classList.remove('show');
+    document.getElementById('formSection').style.display='block';
+    setStep(1);
+    alert('API 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+  }
+}
+
+function setStep(n){
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById('step'+i);
+    el.className='step'+(i<n?' done':i===n?' active':'');
+  }
+}
+
+function downloadPage(){
+  if(!lastData)return;
+  const {name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw}=lastData;
+  const html=buildClientPage(name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw);
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`사주한장_${name}_사주풀이.html`;
+  a.click();
+  setStep(4);
+  setTimeout(()=>{
+    document.getElementById('resultArea').querySelector('.action-row').insertAdjacentHTML('beforeend',
+      `<span style="color:#3a8c5a;font-size:.8rem">✓ 다운로드 완료! Netlify Drop에 업로드하세요.</span>`);
+  },300);
+}
+
+function resetAll(){
+  lastData=null;
+  document.getElementById('formSection').style.display='block';
+  document.getElementById('resultArea').classList.remove('show');
+  setStep(1);
+  document.getElementById('name').value='';
+  document.getElementById('birth').value='';
+  document.getElementById('memo').value='';
+}
+
+function showHistory(){
+  if(!history.length){alert('아직 생성한 풀이가 없습니다.');return;}
+  // Simple inline history view
+  const area=document.querySelector('.content');
+  area.innerHTML=`
+    <button class="btn-outline" onclick="location.reload()" style="margin-bottom:20px">← 돌아가기</button>
+    <div class="card">
+      <div class="card-title">📋 생성 기록 (${history.length}건)</div>
+      <div class="history-list">
+        ${history.map((h,i)=>`
+        <div class="history-item">
+          <div>
+            <div class="name">${h.name} (${h.gender})</div>
+            <div class="meta">${h.y}.${h.m}.${h.d} · ${h.btime} · ${h.concerns.join(', ')}</div>
+            <div class="meta">${h.ts}</div>
+          </div>
+          <button class="dl-btn" onclick="redownload(${i})">⬇ 재다운로드</button>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function redownload(i){
+  const h=history[i];
+  const html=buildClientPage(h.name,h.gender,h.y,h.m,h.d,h.btime,h.concerns,h.ysb,h.msb,h.dsb,h.hsb,h.raw);
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`사주한장_${h.name}_사주풀이.html`;
+  a.click();
+}
+
+
+// ── 오행 계산 ──
+function calcOheng(ysb,msb,dsb,hsb){
+  const map={
+    '甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수',
+    '子':'수','丑':'토','寅':'목','卯':'목','辰':'토','巳':'화','午':'화','未':'토','申':'금','酉':'금','戌':'토','亥':'수'
+  };
+  const cnt={목:0,화:0,토:0,금:0,수:0};
+  [ysb,msb,dsb,hsb].forEach(sb=>{
+    if(!sb)return;
+    cnt[map[sb.s]||'토']=(cnt[map[sb.s]||'토']||0)+1;
+    cnt[map[sb.b]||'토']=(cnt[map[sb.b]||'토']||0)+1;
+  });
+  const total=Object.values(cnt).reduce((a,b)=>a+b,0)||1;
+  const r={};
+  Object.keys(cnt).forEach(k=>r[k]=Math.round(cnt[k]/total*100));
+  return r;
+}
+
+// ── 의뢰인 전용 페이지 빌더 ──
+function buildClientPage(name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw){
+  const today=new Date().toLocaleDateString('ko-KR');
+  const LOGO='/logo.png';
+
+  const pdata=[{lbl:'시주',sb:hsb},{lbl:'일주',sb:dsb},{lbl:'월주',sb:msb},{lbl:'연주',sb:ysb}];
+  const pillarsHTML=pdata.map(p=>p.sb
+    ?'<div class="pillar-wrap"><div class="pillar"><div class="stem">'+p.sb.s+'</div><div class="branch">'+p.sb.b+'</div></div><div class="plbl">'+p.lbl+'</div></div>'
+    :'<div class="pillar-wrap"><div class="pillar" style="opacity:.4"><div class="stem">?</div><div class="branch">?</div></div><div class="plbl">시주</div></div>'
+  ).join('');
+
+  const oh=calcOheng(ysb,msb,dsb,hsb);
+  const ohConfig=[
+    {lbl:'목木',key:'목',color:'#5a8a3a'},
+    {lbl:'화火',key:'화',color:'#c9503a'},
+    {lbl:'토土',key:'토',color:'#c9933a'},
+    {lbl:'금金',key:'금',color:'#8a8a9a'},
+    {lbl:'수水',key:'수',color:'#3a6a9a'}
+  ];
+  const ohRows=ohConfig.map(r=>
+    '<div class="oheng-row">'
+    +'<div class="oheng-label" style="color:'+r.color+'">'+r.lbl+'</div>'
+    +'<div class="oheng-bar-wrap"><div class="oheng-bar" style="background:'+r.color+'" data-pct="'+(oh[r.key]||0)+'"></div></div>'
+    +'<div class="oheng-pct">'+(oh[r.key]||0)+'%</div>'
+    +'</div>'
+  ).join('');
+
+  const safeRaw=raw
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  const icons=['📖','🔮','💼','📅','🗓','✨','🌿','🏠'];
+  const sections=safeRaw.split(/▶/).filter(s=>s.trim());
+  const tabsHTML=sections.map((s,i)=>{
+    const title=s.trim().split('\n')[0].replace(/<[^>]+>/g,'').substring(0,12);
+    return '<button class="tab-btn'+(i===0?' active':'')+'" data-tab="'+i+'">'+icons[i%icons.length]+' '+title+'</button>';
+  }).join('');
+  const panesHTML=sections.map((s,i)=>{
+    const lines=s.trim().split('\n');
+    const body=lines.slice(1).join('<br>').replace(/^(<br>)+/,'');
+    return '<div class="tab-pane'+(i===0?' active':'')+'" data-pane="'+i+'"><div class="saju-text"><strong>'+lines[0].trim()+'</strong><br><br>'+body+'</div></div>';
+  }).join('');
+
+  const metaChips=concerns.map(c=>'<span class="meta-chip">'+c+'</span>').join('');
+
+  const page=[
+    '<!DOCTYPE html><html lang="ko"><head>',
+    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">',
+    '<title>'+name+'님의 사주풀이 · 사주한장</title>',
+    '<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">',
+    '<style>',
+    ':root{--ink:#1a1008;--paper:#f5efe3;--gold:#c9933a;--red:#9b2a1a;--muted:#7a6a52;--border:#d4c4a0;}',
+    '*{margin:0;padding:0;box-sizing:border-box;}',
+    'body{background:var(--paper);color:var(--ink);font-family:"Noto Sans KR",sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at 15% 0%,rgba(201,147,58,.13) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(155,42,26,.09) 0%,transparent 55%);}',
+    '.wrap{max-width:680px;margin:0 auto;padding:0 0 60px;}',
+    'header{text-align:center;padding:48px 20px 32px;border-bottom:1px solid var(--border);}',
+    '.logo-img{width:100px;height:100px;object-fit:contain;display:block;margin:0 auto 8px;}',
+    '.brand{font-family:"Noto Serif KR",serif;font-size:.95rem;font-weight:600;letter-spacing:.2em;color:var(--muted);}',
+    '.client-name{font-family:"Noto Serif KR",serif;font-size:clamp(1.6rem,5vw,2.2rem);font-weight:700;margin:10px 0 5px;}',
+    '.client-name em{color:var(--gold);font-style:normal;}',
+    '.sub{color:var(--muted);font-size:.82rem;}',
+    '.meta-strip{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 0;padding:14px 20px 0;border-top:1px solid var(--border);}',
+    '.meta-chip{padding:4px 13px;background:rgba(201,147,58,.1);border:1px solid rgba(201,147,58,.25);border-radius:20px;font-size:.75rem;color:var(--muted);}',
+    '.pillars{display:flex;justify-content:center;gap:10px;padding:24px 20px 0;}',
+    '.pillar-wrap{text-align:center;}',
+    '.pillar{width:54px;border:1px solid var(--border);border-radius:5px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.07);}',
+    '.stem{background:#9b2a1a;color:white;font-family:"Noto Serif KR",serif;font-size:1.1rem;padding:9px 0;text-align:center;}',
+    '.branch{background:rgba(201,147,58,.12);color:var(--ink);font-family:"Noto Serif KR",serif;font-size:1.1rem;padding:9px 0;text-align:center;border-top:1px solid var(--border);}',
+    '.plbl{font-size:.65rem;color:var(--muted);margin-top:4px;}',
+    '.oheng-section{margin:24px 20px 0;background:rgba(255,255,255,.55);border:1px solid var(--border);border-radius:10px;padding:18px 16px;}',
+    '.oheng-title{font-family:"Noto Serif KR",serif;font-size:.88rem;font-weight:600;color:var(--muted);text-align:center;margin-bottom:14px;letter-spacing:.08em;}',
+    '.oheng-bars{display:flex;flex-direction:column;gap:9px;}',
+    '.oheng-row{display:flex;align-items:center;gap:10px;}',
+    '.oheng-label{width:34px;font-family:"Noto Serif KR",serif;font-size:.8rem;font-weight:600;text-align:right;flex-shrink:0;}',
+    '.oheng-bar-wrap{flex:1;background:rgba(0,0,0,.06);border-radius:20px;height:16px;overflow:hidden;}',
+    '.oheng-bar{height:100%;border-radius:20px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}',
+    '.oheng-pct{width:30px;font-size:.72rem;color:var(--muted);flex-shrink:0;}',
+    '.tab-nav{display:flex;overflow-x:auto;gap:0;padding:24px 20px 0;scrollbar-width:none;}',
+    '.tab-nav::-webkit-scrollbar{display:none;}',
+    '.tab-btn{flex-shrink:0;padding:9px 14px;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;background:rgba(255,255,255,.4);font-size:.75rem;color:var(--muted);cursor:pointer;transition:all .2s;margin-right:4px;white-space:nowrap;font-family:"Noto Sans KR",sans-serif;}',
+    '.tab-btn.active{background:rgba(255,255,255,.85);color:#9b2a1a;font-weight:600;position:relative;top:1px;}',
+    '.tab-content-wrap{margin:0 20px;background:rgba(255,255,255,.65);border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:22px 18px;min-height:180px;}',
+    '.tab-pane{display:none;animation:fadeIn .3s ease;}',
+    '.tab-pane.active{display:block;}',
+    '@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}',
+    '.saju-text{font-size:.92rem;line-height:2.05;color:#2a1f10;}',
+    '.saju-text strong{color:#9b2a1a;font-weight:600;}',
+    '.swipe-hint{text-align:center;font-size:.7rem;color:var(--muted);margin:7px 20px 0;opacity:.7;}',
+    'footer{text-align:center;padding:28px 20px 0;border-top:1px solid var(--border);margin:28px 20px 0;}',
+    'footer .date{font-size:.72rem;color:var(--muted);margin-bottom:12px;}',
+    '.kakao-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#FEE500;color:#3A1D1D;border-radius:24px;font-size:.88rem;font-weight:600;text-decoration:none;margin-bottom:14px;}',
+    'footer .disc{font-size:.7rem;color:var(--muted);line-height:1.8;}',
+    'footer .brand2{font-family:"Noto Serif KR",serif;font-size:.78rem;color:var(--gold);letter-spacing:.1em;margin-top:10px;}',
+    '</style></head><body><div class="wrap">',
+    '<header>',
+    '<img class="logo-img" src="data:image/png;base64,'+LOGO+'" alt="사주한장">',
+    '<div class="brand">사주한장</div>',
+    '<h1 class="client-name"><em>'+name+'</em>님의 사주풀이</h1>',
+    '<p class="sub">'+y+'년 '+m+'월 '+d+'일 · '+btime+' · '+gender+'성</p>',
+    '<div class="meta-strip">'+metaChips+'</div>',
+    '</header>',
+    '<div class="pillars">'+pillarsHTML+'</div>',
+    '<div class="oheng-section"><div class="oheng-title">✦ 내 오행 비율 ✦</div><div class="oheng-bars">'+ohRows+'</div></div>',
+    '<div class="tab-nav" id="tabNav">'+tabsHTML+'</div>',
+    '<div class="tab-content-wrap" id="tabWrap">'+panesHTML+'</div>',
+    '<div class="swipe-hint">← 탭을 눌러 항목별로 확인하세요 →</div>',
+    '<footer>',
+    '<p class="date">풀이 작성일: '+today+'</p>',
+    '<a href="https://open.kakao.com/o/yourlink" class="kakao-btn" target="_blank">💬 추가 상담 문의하기</a>',
+    '<p class="disc">본 풀이는 명리학 이론을 바탕으로 작성된 참고용 콘텐츠입니다.<br>더 깊은 상담이 필요하시면 위 버튼을 눌러 주세요.</p>',
+    '<p class="brand2">사주한장</p>',
+    '</footer></div>',
+    '<script>',
+    'var tabBtns=document.querySelectorAll(".tab-btn");',
+    'var tabPanes=document.querySelectorAll(".tab-pane");',
+    'tabBtns.forEach(function(btn){',
+    '  btn.addEventListener("click",function(){',
+    '    var idx=btn.dataset.tab;',
+    '    tabBtns.forEach(function(b){b.classList.remove("active");});',
+    '    tabPanes.forEach(function(p){p.classList.remove("active");});',
+    '    btn.classList.add("active");',
+    '    tabPanes[idx].classList.add("active");',
+    '    btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});',
+    '  });',
+    '});',
+    'var startX=0;',
+    'var wrap=document.getElementById("tabWrap");',
+    'wrap.addEventListener("touchstart",function(e){startX=e.touches[0].clientX;},{passive:true});',
+    'wrap.addEventListener("touchend",function(e){',
+    '  var diff=startX-e.changedTouches[0].clientX;',
+    '  if(Math.abs(diff)<50)return;',
+    '  var active=document.querySelector(".tab-btn.active");',
+    '  var idx=parseInt(active.dataset.tab);',
+    '  if(diff>0)idx=Math.min(idx+1,tabBtns.length-1);',
+    '  else idx=Math.max(idx-1,0);',
+    '  tabBtns[idx].click();',
+    '},{passive:true});',
+    'setTimeout(function(){',
+    '  document.querySelectorAll(".oheng-bar").forEach(function(bar){bar.style.width=bar.dataset.pct+"%";});',
+    '},300);',
+    '<\/script>',
+    '</body></html>'
+  ].join('\n');
+
+  return page;
+}
+
+</script>
+</body>
+</html>const res=await fetch('/api/saju',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    clearInterval(interval);
+
+    // API 에러 응답 체크
+    if(!res.ok || data.error){
+      const errMsg = data.error ? data.error.type+': '+data.error.message : 'HTTP '+res.status;
+      document.getElementById('progBox').classList.remove('show');
+      document.getElementById('formSection').style.display='block';
+      setStep(1);
+      alert('오류 내용: '+errMsg+'\n\n해결 방법:\n- API 키가 claude.ai 에서 실행 중인지 확인\n- 잠시 후 다시 시도해 주세요');
+      return;
+    }
+
+    const raw=data.content?.map(c=>c.text||'').join('')||'풀이를 가져오지 못했습니다.';
+
+    lastData={name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw,memo,birth};
+    history.unshift({name,birth,concerns,raw,ysb,msb,dsb,hsb,gender,y,m,d,btime,memo,ts:new Date().toLocaleString('ko-KR')});
+
+    // pillars preview
+    const pdata=[{lbl:'시주',sb:hsb},{lbl:'일주',sb:dsb},{lbl:'월주',sb:msb},{lbl:'연주',sb:ysb}];
+    document.getElementById('pillarsPreview').innerHTML=pdata.map(p=>p.sb?`
+      <div><div class="pill"><div class="s">${p.sb.s}</div><div class="b">${p.sb.b}</div></div>
+      <div class="pill-lbl">${p.lbl}</div></div>`
+      :`<div><div class="pill" style="opacity:.35"><div class="s">?</div><div class="b">?</div></div><div class="pill-lbl">시주</div></div>`).join('');
+
+    const html=raw.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    document.getElementById('resName').textContent=name;
+    document.getElementById('resPreview').innerHTML=html;
+    document.getElementById('progBox').classList.remove('show');
+    document.getElementById('resultArea').classList.add('show');
+    setStep(3);
+
+  }catch(e){
+    clearInterval(interval);
+    document.getElementById('progBox').classList.remove('show');
+    document.getElementById('formSection').style.display='block';
+    setStep(1);
+    alert('API 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+  }
+}
+
+function setStep(n){
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById('step'+i);
+    el.className='step'+(i<n?' done':i===n?' active':'');
+  }
+}
+
+function downloadPage(){
+  if(!lastData)return;
+  const {name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw}=lastData;
+  const html=buildClientPage(name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw);
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`사주한장_${name}_사주풀이.html`;
+  a.click();
+  setStep(4);
+  setTimeout(()=>{
+    document.getElementById('resultArea').querySelector('.action-row').insertAdjacentHTML('beforeend',
+      `<span style="color:#3a8c5a;font-size:.8rem">✓ 다운로드 완료! Netlify Drop에 업로드하세요.</span>`);
+  },300);
+}
+
+function resetAll(){
+  lastData=null;
+  document.getElementById('formSection').style.display='block';
+  document.getElementById('resultArea').classList.remove('show');
+  setStep(1);
+  document.getElementById('name').value='';
+  document.getElementById('birth').value='';
+  document.getElementById('memo').value='';
+}
+
+function showHistory(){
+  if(!history.length){alert('아직 생성한 풀이가 없습니다.');return;}
+  // Simple inline history view
+  const area=document.querySelector('.content');
+  area.innerHTML=`
+    <button class="btn-outline" onclick="location.reload()" style="margin-bottom:20px">← 돌아가기</button>
+    <div class="card">
+      <div class="card-title">📋 생성 기록 (${history.length}건)</div>
+      <div class="history-list">
+        ${history.map((h,i)=>`
+        <div class="history-item">
+          <div>
+            <div class="name">${h.name} (${h.gender})</div>
+            <div class="meta">${h.y}.${h.m}.${h.d} · ${h.btime} · ${h.concerns.join(', ')}</div>
+            <div class="meta">${h.ts}</div>
+          </div>
+          <button class="dl-btn" onclick="redownload(${i})">⬇ 재다운로드</button>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function redownload(i){
+  const h=history[i];
+  const html=buildClientPage(h.name,h.gender,h.y,h.m,h.d,h.btime,h.concerns,h.ysb,h.msb,h.dsb,h.hsb,h.raw);
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`사주한장_${h.name}_사주풀이.html`;
+  a.click();
+}
+
+
+// ── 오행 계산 ──
+function calcOheng(ysb,msb,dsb,hsb){
+  const map={
+    '甲':'목','乙':'목','丙':'화','丁':'화','戊':'토','己':'토','庚':'금','辛':'금','壬':'수','癸':'수',
+    '子':'수','丑':'토','寅':'목','卯':'목','辰':'토','巳':'화','午':'화','未':'토','申':'금','酉':'금','戌':'토','亥':'수'
+  };
+  const cnt={목:0,화:0,토:0,금:0,수:0};
+  [ysb,msb,dsb,hsb].forEach(sb=>{
+    if(!sb)return;
+    cnt[map[sb.s]||'토']=(cnt[map[sb.s]||'토']||0)+1;
+    cnt[map[sb.b]||'토']=(cnt[map[sb.b]||'토']||0)+1;
+  });
+  const total=Object.values(cnt).reduce((a,b)=>a+b,0)||1;
+  const r={};
+  Object.keys(cnt).forEach(k=>r[k]=Math.round(cnt[k]/total*100));
+  return r;
+}
+
+// ── 의뢰인 전용 페이지 빌더 ──
+function buildClientPage(name,gender,y,m,d,btime,concerns,ysb,msb,dsb,hsb,raw){
+  const today=new Date().toLocaleDateString('ko-KR');
+  const LOGO='/logo.png';
+
+  const pdata=[{lbl:'시주',sb:hsb},{lbl:'일주',sb:dsb},{lbl:'월주',sb:msb},{lbl:'연주',sb:ysb}];
+  const pillarsHTML=pdata.map(p=>p.sb
+    ?'<div class="pillar-wrap"><div class="pillar"><div class="stem">'+p.sb.s+'</div><div class="branch">'+p.sb.b+'</div></div><div class="plbl">'+p.lbl+'</div></div>'
+    :'<div class="pillar-wrap"><div class="pillar" style="opacity:.4"><div class="stem">?</div><div class="branch">?</div></div><div class="plbl">시주</div></div>'
+  ).join('');
+
+  const oh=calcOheng(ysb,msb,dsb,hsb);
+  const ohConfig=[
+    {lbl:'목木',key:'목',color:'#5a8a3a'},
+    {lbl:'화火',key:'화',color:'#c9503a'},
+    {lbl:'토土',key:'토',color:'#c9933a'},
+    {lbl:'금金',key:'금',color:'#8a8a9a'},
+    {lbl:'수水',key:'수',color:'#3a6a9a'}
+  ];
+  const ohRows=ohConfig.map(r=>
+    '<div class="oheng-row">'
+    +'<div class="oheng-label" style="color:'+r.color+'">'+r.lbl+'</div>'
+    +'<div class="oheng-bar-wrap"><div class="oheng-bar" style="background:'+r.color+'" data-pct="'+(oh[r.key]||0)+'"></div></div>'
+    +'<div class="oheng-pct">'+(oh[r.key]||0)+'%</div>'
+    +'</div>'
+  ).join('');
+
+  const safeRaw=raw
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  const icons=['📖','🔮','💼','📅','🗓','✨','🌿','🏠'];
+  const sections=safeRaw.split(/▶/).filter(s=>s.trim());
+  const tabsHTML=sections.map((s,i)=>{
+    const title=s.trim().split('\n')[0].replace(/<[^>]+>/g,'').substring(0,12);
+    return '<button class="tab-btn'+(i===0?' active':'')+'" data-tab="'+i+'">'+icons[i%icons.length]+' '+title+'</button>';
+  }).join('');
+  const panesHTML=sections.map((s,i)=>{
+    const lines=s.trim().split('\n');
+    const body=lines.slice(1).join('<br>').replace(/^(<br>)+/,'');
+    return '<div class="tab-pane'+(i===0?' active':'')+'" data-pane="'+i+'"><div class="saju-text"><strong>'+lines[0].trim()+'</strong><br><br>'+body+'</div></div>';
+  }).join('');
+
+  const metaChips=concerns.map(c=>'<span class="meta-chip">'+c+'</span>').join('');
+
+  const page=[
+    '<!DOCTYPE html><html lang="ko"><head>',
+    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">',
+    '<title>'+name+'님의 사주풀이 · 사주한장</title>',
+    '<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">',
+    '<style>',
+    ':root{--ink:#1a1008;--paper:#f5efe3;--gold:#c9933a;--red:#9b2a1a;--muted:#7a6a52;--border:#d4c4a0;}',
+    '*{margin:0;padding:0;box-sizing:border-box;}',
+    'body{background:var(--paper);color:var(--ink);font-family:"Noto Sans KR",sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at 15% 0%,rgba(201,147,58,.13) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(155,42,26,.09) 0%,transparent 55%);}',
+    '.wrap{max-width:680px;margin:0 auto;padding:0 0 60px;}',
+    'header{text-align:center;padding:48px 20px 32px;border-bottom:1px solid var(--border);}',
+    '.logo-img{width:100px;height:100px;object-fit:contain;display:block;margin:0 auto 8px;}',
+    '.brand{font-family:"Noto Serif KR",serif;font-size:.95rem;font-weight:600;letter-spacing:.2em;color:var(--muted);}',
+    '.client-name{font-family:"Noto Serif KR",serif;font-size:clamp(1.6rem,5vw,2.2rem);font-weight:700;margin:10px 0 5px;}',
+    '.client-name em{color:var(--gold);font-style:normal;}',
+    '.sub{color:var(--muted);font-size:.82rem;}',
+    '.meta-strip{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0 0;padding:14px 20px 0;border-top:1px solid var(--border);}',
+    '.meta-chip{padding:4px 13px;background:rgba(201,147,58,.1);border:1px solid rgba(201,147,58,.25);border-radius:20px;font-size:.75rem;color:var(--muted);}',
+    '.pillars{display:flex;justify-content:center;gap:10px;padding:24px 20px 0;}',
+    '.pillar-wrap{text-align:center;}',
+    '.pillar{width:54px;border:1px solid var(--border);border-radius:5px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.07);}',
+    '.stem{background:#9b2a1a;color:white;font-family:"Noto Serif KR",serif;font-size:1.1rem;padding:9px 0;text-align:center;}',
+    '.branch{background:rgba(201,147,58,.12);color:var(--ink);font-family:"Noto Serif KR",serif;font-size:1.1rem;padding:9px 0;text-align:center;border-top:1px solid var(--border);}',
+    '.plbl{font-size:.65rem;color:var(--muted);margin-top:4px;}',
+    '.oheng-section{margin:24px 20px 0;background:rgba(255,255,255,.55);border:1px solid var(--border);border-radius:10px;padding:18px 16px;}',
+    '.oheng-title{font-family:"Noto Serif KR",serif;font-size:.88rem;font-weight:600;color:var(--muted);text-align:center;margin-bottom:14px;letter-spacing:.08em;}',
+    '.oheng-bars{display:flex;flex-direction:column;gap:9px;}',
+    '.oheng-row{display:flex;align-items:center;gap:10px;}',
+    '.oheng-label{width:34px;font-family:"Noto Serif KR",serif;font-size:.8rem;font-weight:600;text-align:right;flex-shrink:0;}',
+    '.oheng-bar-wrap{flex:1;background:rgba(0,0,0,.06);border-radius:20px;height:16px;overflow:hidden;}',
+    '.oheng-bar{height:100%;border-radius:20px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}',
+    '.oheng-pct{width:30px;font-size:.72rem;color:var(--muted);flex-shrink:0;}',
+    '.tab-nav{display:flex;overflow-x:auto;gap:0;padding:24px 20px 0;scrollbar-width:none;}',
+    '.tab-nav::-webkit-scrollbar{display:none;}',
+    '.tab-btn{flex-shrink:0;padding:9px 14px;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;background:rgba(255,255,255,.4);font-size:.75rem;color:var(--muted);cursor:pointer;transition:all .2s;margin-right:4px;white-space:nowrap;font-family:"Noto Sans KR",sans-serif;}',
+    '.tab-btn.active{background:rgba(255,255,255,.85);color:#9b2a1a;font-weight:600;position:relative;top:1px;}',
+    '.tab-content-wrap{margin:0 20px;background:rgba(255,255,255,.65);border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:22px 18px;min-height:180px;}',
+    '.tab-pane{display:none;animation:fadeIn .3s ease;}',
+    '.tab-pane.active{display:block;}',
+    '@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}',
+    '.saju-text{font-size:.92rem;line-height:2.05;color:#2a1f10;}',
+    '.saju-text strong{color:#9b2a1a;font-weight:600;}',
+    '.swipe-hint{text-align:center;font-size:.7rem;color:var(--muted);margin:7px 20px 0;opacity:.7;}',
+    'footer{text-align:center;padding:28px 20px 0;border-top:1px solid var(--border);margin:28px 20px 0;}',
+    'footer .date{font-size:.72rem;color:var(--muted);margin-bottom:12px;}',
+    '.kakao-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#FEE500;color:#3A1D1D;border-radius:24px;font-size:.88rem;font-weight:600;text-decoration:none;margin-bottom:14px;}',
+    'footer .disc{font-size:.7rem;color:var(--muted);line-height:1.8;}',
+    'footer .brand2{font-family:"Noto Serif KR",serif;font-size:.78rem;color:var(--gold);letter-spacing:.1em;margin-top:10px;}',
+    '</style></head><body><div class="wrap">',
+    '<header>',
+    '<img class="logo-img" src="data:image/png;base64,'+LOGO+'" alt="사주한장">',
+    '<div class="brand">사주한장</div>',
+    '<h1 class="client-name"><em>'+name+'</em>님의 사주풀이</h1>',
+    '<p class="sub">'+y+'년 '+m+'월 '+d+'일 · '+btime+' · '+gender+'성</p>',
+    '<div class="meta-strip">'+metaChips+'</div>',
+    '</header>',
+    '<div class="pillars">'+pillarsHTML+'</div>',
+    '<div class="oheng-section"><div class="oheng-title">✦ 내 오행 비율 ✦</div><div class="oheng-bars">'+ohRows+'</div></div>',
+    '<div class="tab-nav" id="tabNav">'+tabsHTML+'</div>',
+    '<div class="tab-content-wrap" id="tabWrap">'+panesHTML+'</div>',
+    '<div class="swipe-hint">← 탭을 눌러 항목별로 확인하세요 →</div>',
+    '<footer>',
+    '<p class="date">풀이 작성일: '+today+'</p>',
+    '<a href="https://open.kakao.com/o/yourlink" class="kakao-btn" target="_blank">💬 추가 상담 문의하기</a>',
+    '<p class="disc">본 풀이는 명리학 이론을 바탕으로 작성된 참고용 콘텐츠입니다.<br>더 깊은 상담이 필요하시면 위 버튼을 눌러 주세요.</p>',
+    '<p class="brand2">사주한장</p>',
+    '</footer></div>',
+    '<script>',
+    'var tabBtns=document.querySelectorAll(".tab-btn");',
+    'var tabPanes=document.querySelectorAll(".tab-pane");',
+    'tabBtns.forEach(function(btn){',
+    '  btn.addEventListener("click",function(){',
+    '    var idx=btn.dataset.tab;',
+    '    tabBtns.forEach(function(b){b.classList.remove("active");});',
+    '    tabPanes.forEach(function(p){p.classList.remove("active");});',
+    '    btn.classList.add("active");',
+    '    tabPanes[idx].classList.add("active");',
+    '    btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});',
+    '  });',
+    '});',
+    'var startX=0;',
+    'var wrap=document.getElementById("tabWrap");',
+    'wrap.addEventListener("touchstart",function(e){startX=e.touches[0].clientX;},{passive:true});',
+    'wrap.addEventListener("touchend",function(e){',
+    '  var diff=startX-e.changedTouches[0].clientX;',
+    '  if(Math.abs(diff)<50)return;',
+    '  var active=document.querySelector(".tab-btn.active");',
+    '  var idx=parseInt(active.dataset.tab);',
+    '  if(diff>0)idx=Math.min(idx+1,tabBtns.length-1);',
+    '  else idx=Math.max(idx-1,0);',
+    '  tabBtns[idx].click();',
+    '},{passive:true});',
+    'setTimeout(function(){',
+    '  document.querySelectorAll(".oheng-bar").forEach(function(bar){bar.style.width=bar.dataset.pct+"%";});',
+    '},300);',
+    '<\/script>',
+    '</body></html>'
+  ].join('\n');
+
+  return page;
+}
+
+</script>
+</body>
+</html>
