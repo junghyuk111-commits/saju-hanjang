@@ -1,6 +1,11 @@
 {
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "api/saju.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/saju", "dest": "/api/saju.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
