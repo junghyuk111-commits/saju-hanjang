@@ -240,7 +240,7 @@ function downloadPDF(){
     +'<style>'
     +'*{margin:0;padding:0;box-sizing:border-box;}'
     +'body{background:#f8f7f4;color:#1a1410;font-family:"Noto Sans KR",sans-serif;}'
-   @media print{'
+    +'@media print{'
     +'*{-webkit-print-color-adjust:exact !important;}'
     +'body{background:white !important;}'
     +'.no-print{display:none !important;}'
