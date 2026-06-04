@@ -24,14 +24,16 @@ function calcOheng(ysb,msb,dsb,hsb){
 var lastData=null;
 var historyList=[];
 
-// ── 태그 토글 ──
-document.querySelectorAll('.tag').forEach(function(t){
-  t.addEventListener('click',function(){t.classList.toggle('on');});
-});
+document.addEventListener('DOMContentLoaded', function(){
+  // ── 태그 토글 ──
+  document.querySelectorAll('.tag').forEach(function(t){
+    t.addEventListener('click',function(){t.classList.toggle('on');});
+  });
 
-// ── 히스토리 버튼 ──
-document.getElementById('navHistory').addEventListener('click', showHistory);
-document.getElementById('navNew').addEventListener('click', function(){location.reload();});
+  // ── 히스토리 버튼 ──
+  document.getElementById('navHistory').addEventListener('click', showHistory);
+  document.getElementById('navNew').addEventListener('click', function(){location.reload();});
+});
 
 // ── setStep ──
 function setStep(n){
