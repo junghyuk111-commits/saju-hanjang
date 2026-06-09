@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-noto-sans);
+  --font-serif: var(--font-noto-serif);
+}
+
+body {
+  background: #faf8f2;
+  color: #3a2a5a;
+  font-family: var(--font-noto-sans), 'Noto Sans KR', sans-serif;
+}
